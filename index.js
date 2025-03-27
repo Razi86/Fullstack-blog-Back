@@ -61,6 +61,28 @@ app.put(
     }
 );
 
+
+app.post('/posts',async(req,res) => {
+    const {author,title,content,cover,date} = req.body;
+    try {
+        const result = await client.query
+        ('insert into posts (author,title,content,cover,date) values ($1,$2,$3,$4,$5)',[author,title,content,cover,date]);
+        res.status(201).send('post added successfully')
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
+app.delete('/posts/:id',async(req,res) => {
+    const {id} = req.params;
+    try {
+        const result = await client.query('delete from posts where id= $1',[id]);
+        res.send('post deleted');
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
 })
