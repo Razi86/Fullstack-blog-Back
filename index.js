@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import client from './db.js';
+import cors from 'cors';
 
 import { body, param, validationResult } from 'express-validator';
 
@@ -9,9 +10,10 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-pp.use(cors());
 const app= express();
-client();
+app.use(cors());
+app.use(express.json());
+
 
 // Utility function for error responses
 const handleErrors = (req, res, next) => {
