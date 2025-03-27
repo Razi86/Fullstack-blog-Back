@@ -1,16 +1,28 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import client from './db.js';
+import cors from 'cors';
+
+import { body, param, validationResult } from 'express-validator';
+
 
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 const app= express();
+app.use(cors());
+app.use(express.json());
 
-app.listen(PORT, () => {
-    console.log(`server is running on ${PORT}`);
-})
+
+// Utility function for error responses
+const handleErrors = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+};
 
 app.get('/',async (req,res) => {
     try {
@@ -20,3 +32,35 @@ app.get('/',async (req,res) => {
     }
 })
 
+app.put(
+    "/posts/:id",
+    [
+        param("id").isInt().withMessage("Post ID must be an integer"),
+        body("author").trim().notEmpty().withMessage("Author is required"),
+        body("title").trim().notEmpty().withMessage("Title is required"),
+        body("content").trim().notEmpty().withMessage("Content is required"),
+        body("cover").trim().notEmpty().withMessage("Cover URL is required"),
+    ],
+    handleErrors,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { author, title, content, cover } = req.body;
+
+            const result = await pool.query(
+                "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4, updated_at = NOW() WHERE id = $5 RETURNING *",
+                [author, title, content, cover, id]
+            );
+
+            if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
+            res.json(result.rows[0]);
+        } catch (err) {
+            console.error("Error updating post:", err.message);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+);
+
+app.listen(PORT, () => {
+    console.log(`server is running on ${PORT}`);
+})
