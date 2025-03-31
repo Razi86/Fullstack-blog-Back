@@ -14,7 +14,7 @@ const app= express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/',async(req,res) => {
+app.get('/posts',async(req,res) => {
     try {
         const result = await client.query('select * from posts');
         res.json(result.rows);
@@ -67,8 +67,8 @@ app.put(
             const { id } = req.params;
             const { author, title, content, cover } = req.body;
 
-            const result = await pool.query(
-                "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4, updated_at = NOW() WHERE id = $5 RETURNING *",
+            const result = await client.query(
+                "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4 WHERE id = $5 RETURNING *",
                 [author, title, content, cover, id]
             );
 
