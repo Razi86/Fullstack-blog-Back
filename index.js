@@ -66,7 +66,7 @@ app.put(
             const { id } = req.params;
             const { author, title, content, cover } = req.body;
 
-            const result = await pool.query(
+            const result = await client.query(
                 "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4, updated_at = NOW() WHERE id = $5 RETURNING *",
                 [author, title, content, cover, id]
             );
