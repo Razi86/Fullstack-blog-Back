@@ -42,14 +42,15 @@ const handleErrors = (req, res, next) => {
     next();
 };
 
-// app.get('/',async (req,res) => {
-//     try {
-//          res.json({message: 'server is running'});
-//     } catch (error) {
-//         res.status(500).send(error.message)
-//     }
-// })
-
+app.get('/posts/:id',async(req,res) => {
+    const {id} = req.params;
+    try {
+        const result = await client.query('select * from posts where id= $1',[id]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
 
 app.put(
     "/posts/:id",
@@ -82,10 +83,14 @@ app.put(
 
 
 app.post('/posts',async(req,res) => {
-    const {author,title,content,cover,date} = req.body;
+    const {author,title,content,cover} = req.body;
+    if(!author || !title || !content || !cover){
+        return res.status(400).json({message:'All fields are required'});
+    }
+
     try {
         const result = await client.query
-        ('insert into posts (author,title,content,cover,date) values ($1,$2,$3,$4,$5)',[author,title,content,cover,date]);
+        ('insert into posts (author,title,content,cover) values ($1,$2,$3,$4)',[author,title,content,cover]);
         res.status(201).send('post added successfully')
     } catch (error) {
         res.status(500).send(error.message)
