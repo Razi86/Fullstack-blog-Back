@@ -14,7 +14,7 @@ const app= express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/',async(req,res) => {
+app.get('/posts',async(req,res) => {
     try {
         const result = await client.query('select * from posts');
         res.json(result.rows);
