@@ -42,15 +42,6 @@ const handleErrors = (req, res, next) => {
     next();
 };
 
-// app.get('/',async (req,res) => {
-//     try {
-//          res.json({message: 'server is running'});
-//     } catch (error) {
-//         res.status(500).send(error.message)
-//     }
-// })
-
-
 app.get('/posts/:id',async(req,res) => {
     const {id} = req.params;
     try {
