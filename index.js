@@ -14,6 +14,24 @@ const app= express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/',async(req,res) => {
+    try {
+        const result = await client.query('select * from posts');
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+app.get('/posts/:id',async(req,res) => {
+    const {id} = req.params;
+    try {
+        const result = await client.query('select * from posts where id= $1',[id]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
 
 // Utility function for error responses
 const handleErrors = (req, res, next) => {
@@ -24,13 +42,14 @@ const handleErrors = (req, res, next) => {
     next();
 };
 
-app.get('/',async (req,res) => {
-    try {
-         res.json({message: 'server is running'});
-    } catch (error) {
-        res.status(500).send(error.message)
-    }
-})
+// app.get('/',async (req,res) => {
+//     try {
+//          res.json({message: 'server is running'});
+//     } catch (error) {
+//         res.status(500).send(error.message)
+//     }
+// })
+
 
 app.put(
     "/posts/:id",
