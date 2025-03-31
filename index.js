@@ -67,7 +67,7 @@ app.put(
             const { author, title, content, cover } = req.body;
 
             const result = await client.query(
-                "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4, updated_at = NOW() WHERE id = $5 RETURNING *",
+                "UPDATE posts SET author = $1, title = $2, content = $3, cover = $4 WHERE id = $5 RETURNING *",
                 [author, title, content, cover, id]
             );
 
